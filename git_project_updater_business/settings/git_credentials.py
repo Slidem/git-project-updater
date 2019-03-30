@@ -8,3 +8,9 @@ class GitCredentials:
 
     def get_password(self):
         return self.__password
+
+    def __str__(self):
+        return "Username: {username} \nPassword: {password}".format(
+            username=self.__username,
+            password=self.__password
+        )
