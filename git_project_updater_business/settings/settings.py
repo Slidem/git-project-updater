@@ -20,7 +20,7 @@ class Settings:
         return self.__project_root_directories
 
     def get_project_type(self):
-        return self.get_project_type
+        return self.__projects_type
 
     def __str__(self):
         settings = ""

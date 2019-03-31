@@ -11,6 +11,7 @@ class SetSettingsCommand(Command):
         git_credentials = self.__get_git_credentials()
         projects_type = self.__get_projects_type()
         projects_root_directories = self.__get_projects_root_directories()
+
         set_settings(
             Settings(
                 git_credentials,
@@ -30,7 +31,7 @@ class SetSettingsCommand(Command):
 
     def __get_projects_type(self):
         while True:
-            project_type = input("Project type:")
+            project_type = input("Project type: ")
             if is_valid_project_type(project_type):
                 return project_type
 
@@ -39,7 +40,7 @@ class SetSettingsCommand(Command):
     def __get_projects_root_directories(self):
         while True:
             project_root_directories = input(
-                "Enter project root directores, comma separated:")
+                "Enter project root directores, comma separated: ")
 
             if project_root_directories:
                 return project_root_directories

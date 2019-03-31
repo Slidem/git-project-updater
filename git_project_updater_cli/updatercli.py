@@ -8,17 +8,17 @@ def main():
         print_menu()
         command_number = input("Enter action number:")
         command = create_command(command_number)
-        print(command)
+        print("\n", command)
         command.execute()
 
 
 def print_menu():
-    print("=========================================")
+    print("\n=========================================")
     print("Git project updater CLI. Choose a number and press enter")
     print("1. Set project settings")
     print("2. Print project settings")
     print("0. Exit")
-    print("=========================================")
+    print("=========================================\n")
 
     pass
 
