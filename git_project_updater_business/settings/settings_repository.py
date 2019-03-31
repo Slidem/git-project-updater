@@ -1,6 +1,10 @@
 import os
+import json
 from git_project_updater_business.settings.git_credentials import GitCredentials
 from git_project_updater_business.settings.settings import Settings
+
+SETTINGS_JSON_PATH = "{baseFolder}/git_project_updater_business/settings/settings.json".format(
+    baseFolder=os.environ["PYTHONPATH"])
 
 settings_cache = None
 
@@ -15,16 +19,15 @@ def get_settings():
     if settings_cache:
         return settings_cache
 
-    git_credentials = get_git_credentials_from_en()
-    project_root_directories = os.environ.get(
-        "PROJECT_UPDATER_ROOT_DIRECTORIES")
-    project_type = os.environ.get("PROJECT_UPDATER_TYPE")
+    with open(SETTINGS_JSON_PATH) as json_file:
+        try:
+            settings = json.load(json_file)
+            if not settings:
+                return None
 
-    if not (git_credentials and project_root_directories and project_type):
-        return None
-
-    settings_cache = Settings(
-        git_credentials, project_root_directories, project_type)
+            settings_cache = create_settings_from_json(settings)
+        except json.decoder.JSONDecodeError:
+            return None
 
     return settings_cache
 
@@ -38,21 +41,29 @@ def set_settings(settings):
     if not isinstance(settings, Settings):
         raise ValueError("settings is not a Settings instance")
 
-    os.environ["PROJECT_UPDATER_GIT_USERNAME"] = settings.get_git_credentials(
-    ).get_username()
-    os.environ["PROJECT_UPDATER_GIT_USERNAME"] = settings.get_git_credentials(
-    ).get_password()
-    os.environ["PROJECT_UPDATER_ROOT_DIRECTORIES"] = settings.get_project_root_directories()
-    os.environ["PROJECT_UPDATER_TYPE"] = settings.get_project_type()
+    settings_data = {
+        "gitCredentials": {
+            "username": settings.get_git_credentials().get_username(),
+            "password": settings.get_git_credentials().get_password(),
+        },
+        "projectsType": settings.get_projects_type(),
+        "projectsRootDirectories": settings.get_project_root_directories(),
+    }
+
+    with open(SETTINGS_JSON_PATH, "w") as json_file:
+        json.dump(settings_data, json_file)
 
     settings_cache = settings
 
 
-def get_git_credentials_from_en():
-    username = os.environ.get("PROJECT_UPDATER_GIT_USERNAME")
-    password = os.environ.get("PROJECT_UPDATER_GIT_PASSWORD")
+def create_settings_from_json(settings_json):
+    # git credentials
+    username = settings_json.get("gitCredentials").get("username")
+    password = settings_json.get("gitCredentials").get("password")
+    credentials = GitCredentials(username, password)
 
-    if not username or not password:
-        return None
+    # project settings
+    projects_type = settings_json.get("projectsType")
+    projects_root_directories = settings_json.get("projectsRootDirectories")
 
-    return GitCredentials(username, password)
+    return Settings(credentials, projects_root_directories, projects_type)

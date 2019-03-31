@@ -17,10 +17,9 @@ def print_menu():
     print("Git project updater CLI. Choose a number and press enter")
     print("1. Set project settings")
     print("2. Print project settings")
+    print("3. List projects")
     print("0. Exit")
     print("=========================================\n")
-
-    pass
 
 
 if __name__ == "__main__":

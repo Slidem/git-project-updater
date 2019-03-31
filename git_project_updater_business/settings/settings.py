@@ -19,7 +19,7 @@ class Settings:
     def get_project_root_directories(self):
         return self.__project_root_directories
 
-    def get_project_type(self):
+    def get_projects_type(self):
         return self.__projects_type
 
     def __str__(self):

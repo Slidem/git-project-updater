@@ -1,6 +1,7 @@
 from git_project_updater_cli.commands.exit_command import ExitCommand
 from git_project_updater_cli.commands.print_settings_command import PrintCommand
 from git_project_updater_cli.commands.set_settings_command import SetSettingsCommand
+from git_project_updater_cli.commands.list_projects_command import ListProjectsCommand
 
 
 def create_command(command):
@@ -10,3 +11,5 @@ def create_command(command):
         return SetSettingsCommand()
     if "2" == command:
         return PrintCommand()
+    if "3" == command:
+        return ListProjectsCommand()
