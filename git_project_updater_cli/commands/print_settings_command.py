@@ -1,10 +1,10 @@
 from git_project_updater_cli.commands.command import Command
-from git_project_updater_business.settings.settings_repository import get_settings
+from git_project_updater_business.settings.settings_repository import SettingsRepository
 
 
 class PrintCommand(Command):
     def execute(self):
-        settings = get_settings()
+        settings = SettingsRepository.get_instance().get_settings()
         if settings:
             print(settings)
         else:

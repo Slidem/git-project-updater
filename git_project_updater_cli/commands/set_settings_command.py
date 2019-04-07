@@ -1,6 +1,6 @@
 from git_project_updater_cli.commands.command import Command
 from git_project_updater_business.settings.git_credentials import GitCredentials
-from git_project_updater_business.settings.settings_repository import set_settings
+from git_project_updater_business.settings.settings_repository import SettingsRepository
 from git_project_updater_business.settings.settings import Settings
 from git_project_updater_business.validators.project_type_validaor import is_valid_project_type
 from git_project_updater_business.utils.input_utils import exitable_input
@@ -12,7 +12,7 @@ class SetSettingsCommand(Command):
         projects_type = self.__get_projects_type()
         projects_root_directories = self.__get_projects_root_directories()
 
-        set_settings(
+        SettingsRepository.get_instance().set_settings(
             Settings(
                 git_credentials,
                 projects_root_directories,

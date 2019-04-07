@@ -1,5 +1,3 @@
-from git_project_updater_business.settings.settings_repository import set_settings
-from git_project_updater_business.settings.settings_repository import get_settings
 from git_project_updater_cli.commands.command_factory import create_command
 
 

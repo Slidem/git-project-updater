@@ -16,7 +16,7 @@ class Settings:
     def get_git_credentials(self):
         return self.__git_credentials
 
-    def get_project_root_directories(self):
+    def get_project_root_directory(self):
         return self.__project_root_directories
 
     def get_projects_type(self):
