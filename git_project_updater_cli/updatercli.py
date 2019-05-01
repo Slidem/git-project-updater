@@ -11,13 +11,13 @@ def main():
 
 
 def print_menu():
-    print("\n=========================================")
+    print("\n======================================================")
     print("Git project updater CLI. Choose a number and press enter")
     print("1. Set project settings")
     print("2. Print project settings")
     print("3. List projects")
     print("0. Exit")
-    print("=========================================\n")
+    print("========================================================\n")
 
 
 if __name__ == "__main__":

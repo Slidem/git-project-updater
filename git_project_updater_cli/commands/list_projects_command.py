@@ -11,7 +11,8 @@ class ListProjectsCommand(Command):
             settings, ProjectScannerFactory.get_instance())
 
         for p in projects:
-            print(p.get_details())
+            print()
+            print(p.get_project_id(), "\n")
 
     def __str__(self):
         return "=== Projects list ==="

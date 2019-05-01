@@ -1,1 +1,8 @@
-{"gitCredentials": {"username": "alex", "password": "mihai"}, "projectsType": "maven", "projectsRootDirectories": "~/Development/git-sources/light-di"}
+{
+    "gitCredentials": {
+        "username": "mihai.v.alexandru@gmail.com",
+        "password": "0744451501cal"
+    },
+    "projectsType": "maven",
+    "projectsRootDirectories": "/home/slidem/Development/git-sources/"
+}

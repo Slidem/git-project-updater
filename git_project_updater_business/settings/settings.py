@@ -6,7 +6,7 @@ class Settings:
         if not (git_credentials and project_root_directories and projects_type):
             raise ValueError("Non null values expected")
 
-        if not (isinstance(project_root_directories, (list, str)) and isinstance(projects_type, str) and isinstance(git_credentials, GitCredentials)):
+        if not (isinstance(project_root_directories, str) and isinstance(projects_type, str) and isinstance(git_credentials, GitCredentials)):
             raise ValueError("Invalid values")
 
         self.__git_credentials = git_credentials

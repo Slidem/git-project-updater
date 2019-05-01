@@ -17,7 +17,12 @@ class ProjectsRepository:
 
     def get_projects(self, settings, project_scanner_factory):
         if not self.__projects:
-            self.__projects = project_scanner_factory.get_projects_scanner(
-                settings).get_projects(settings)
-
+            self.__read_projects(settings, project_scanner_factory)
         return self.__projects
+
+    def refresh_projects(self, settings, project_scanner_factory):
+        self.__read_projects(settings, project_scanner_factory)
+
+    def __read_projects(self, settings, project_scanner_factory):
+        self.__projects = project_scanner_factory.get_projects_scanner(
+            settings).get_projects(settings)

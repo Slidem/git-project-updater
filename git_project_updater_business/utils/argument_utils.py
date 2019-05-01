@@ -61,7 +61,7 @@ def validate_details(details_argument, details_argument_name):
 
 
 def validate_settings(settings_argument):
-    """ Validates if the given argument is of type ProjectDetails"""
+    """ Validates if the given argument is of type Settings"""
 
     if not isinstance(settings_argument, Settings):
         raise ValueError("Illegal settings argument")

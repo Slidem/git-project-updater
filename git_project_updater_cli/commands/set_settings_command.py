@@ -40,7 +40,7 @@ class SetSettingsCommand(Command):
     def __get_projects_root_directories(self):
         while True:
             project_root_directories = input(
-                "Enter project root directores, comma separated: ")
+                "Enter project root directory: ")
 
             if project_root_directories:
                 return project_root_directories
