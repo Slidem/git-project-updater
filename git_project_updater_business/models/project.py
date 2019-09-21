@@ -1,63 +1,41 @@
 from git_project_updater_business.utils.argument_utils import *
+from abc import *
 
 
-class Project:
-    __project_id = None
-    __project_type = None
-    __path = None
-    __details = None
-    __children = []
+class Project(ABC):
 
-    def __init__(self, project_id, project_parent_id, project_type, path, details, children, dependencies):
-        self.__project_id = validate_string(project_id, "project_id")
-        self.__project_parent_id = validate_string(
-            project_parent_id, "project_parent_id")
-        self.__project_type = validate_string(project_type, "project_type")
-        self.__path = path = validate_path(path, "path")
-        self.__details = validate_details(details, "details")
-        self.__children = validate_and_get_new_list(
-            children, Project, "children")
-        self.__dependencies = validate_and_get_new_list(
-            dependencies, Project, "children")
+    def __init__(self, **kwargs):
+        self.project_id = kwargs["project_id"]
+        self.project_type = kwargs["project_type"]
+        self.path = kwargs["path"]
+        self.project_parent_id = kwargs.get("project_parent_id", None)
 
-    def add_dependency(self, dependency):
-        if not dependency or not isinstance(dependency, Project):
-            raise ValueError("Invalid Project argument")
+    def accept(self, visitor):
+        if not visitor:
+            raise ValueError("Cannot accept an empty visitor")
 
-        if not self.__dependencies:
-            self.__dependencies = []
+        visitor.visit(self)
 
-        self.__dependencies.append(dependency)
+    @abstractmethod
+    def _get_details_str(self):
+        pass
 
-    def add_child(self, child):
-        if not child or not isinstance(child, Project):
-            raise ValueError("Invalid Project argument")
+    def __add_projects(self, projects, value):
+        if isinstance(value, Project):
+            projects.append(value)
 
-        if not self.__children:
-            self.__children = []
-
-        self.__children.append(child)
-
-    def get_children(self):
-        return this.__children
-
-    def get_project_id(self):
-        return self.__project_id
-
-    def get_details(self):
-        return self.__details
+        if isinstance(value, list):
+            for v in value:
+                if not isinstance(v, Project):
+                    raise ValueError("Expected a Project or a list of Project")
+                projects.append(v)
 
     def __str__(self):
         project_str = "------------ Project -------------\n"
-        project_str += "parent-id: " + self.__project_parent_id + "\n"
-        project_str += "id: " + self.__project_id + "\n"
-        project_str += "type: " + self.__project_type + "\n"
-        project_str += "path: " + str(self.__path) + "\n"
-        project_str += "children ids: " + \
-            ", ".join(map(lambda p: p.__project_id, self.__children)) + "\n"
-        project_str += "dependencies ids: " + \
-            ", ".join(map(lambda p: p.__project_id,
-                          self.__dependencies)) + "\n"
+        project_str += "parent-id: " + self.project_parent_id + "\n"
+        project_str += "id: " + self.project_id + "\n"
+        project_str += "type: " + self.project_type + "\n"
+        project_str += "path: " + str(self.path) + "\n"
         project_str += "----------- Details --------------\n"
-        project_str += str(self.__details)
+        project_str += str(self._get_details_str)
         return project_str

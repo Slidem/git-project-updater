@@ -19,7 +19,7 @@ class ProjectScannerFactory:
             ProjectScannerFactory.__instance = self
 
     def get_projects_scanner(self, settings):
-        projects_type = settings.get_projects_type()
+        projects_type = settings.projects_type
         if projects_type == "maven":
             return MavenProjectsScanner()
         else:

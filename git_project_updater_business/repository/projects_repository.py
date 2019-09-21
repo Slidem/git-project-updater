@@ -1,28 +1,34 @@
 class ProjectsRepository:
     __instance = None
-    __projects = None
 
     @staticmethod
-    def get_instance():
+    def get_instance(settings_repository, project_scanner_factory):
         if ProjectsRepository.__instance == None:
-            ProjectsRepository()
+            ProjectsRepository(settings_repository, project_scanner_factory)
         return ProjectsRepository.__instance
 
-    def __init__(self):
+    def __init__(self, settings_repository, project_scanner_factory):
         """ Virtually private constructor. """
         if ProjectsRepository.__instance != None:
             raise Exception("This class is a singleton!")
         else:
+            self.settings_repository = settings_repository
+            self.project_scanner_factory = project_scanner_factory
+            self.projects = None
             ProjectsRepository.__instance = self
 
-    def get_projects(self, settings, project_scanner_factory):
-        if not self.__projects:
-            self.__read_projects(settings, project_scanner_factory)
-        return self.__projects
+    def get_projects(self):
+        if not self.projects:
+            self.refresh_projects()
+        return self.projects
 
-    def refresh_projects(self, settings, project_scanner_factory):
-        self.__read_projects(settings, project_scanner_factory)
+    def refresh_projects(self):
+        self.__read_projects()
 
-    def __read_projects(self, settings, project_scanner_factory):
-        self.__projects = project_scanner_factory.get_projects_scanner(
-            settings).get_projects(settings)
+    def __read_projects(self):
+        settings = self.settings_repository.get_settings()
+        if not settings:
+            print("Warning! Settings have not been set yet, projects will be empty")
+        else:
+            self.projects = self.project_scanner_factory.get_projects_scanner(
+                settings).get_projects(settings)

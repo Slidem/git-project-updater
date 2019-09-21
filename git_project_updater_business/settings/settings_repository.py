@@ -62,11 +62,11 @@ class SettingsRepository:
         with open(SETTINGS_JSON_PATH, "w") as json_file:
             settings_data = {
                 GIT_CREDENTIALS_JSON_KEY: {
-                    GIT_CREDENTIALS_USERNAME_JSON_KEY: settings.get_git_credentials().get_username(),
-                    GIT_CREDENTIALS_PASSWORD_JSON_KEY: settings.get_git_credentials().get_password(),
+                    GIT_CREDENTIALS_USERNAME_JSON_KEY: settings.git_credentials.username,
+                    GIT_CREDENTIALS_PASSWORD_JSON_KEY: settings.git_credentials.password,
                 },
-                PROJECTS_TYPE_JSON_KEY: settings.get_projects_type(),
-                PROJECTS_ROOT_DIRECTORIES_JSON_KEY: settings.get_project_root_directory(),
+                PROJECTS_TYPE_JSON_KEY: settings.projects_type,
+                PROJECTS_ROOT_DIRECTORIES_JSON_KEY: settings.projects_root_directory,
             }
             json.dump(settings_data, json_file)
 

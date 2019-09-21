@@ -1,5 +1,4 @@
 from pathlib import Path
-from git_project_updater_business.models.project_details import ProjectDetails
 from git_project_updater_business.settings.settings import Settings
 
 
@@ -48,16 +47,6 @@ def validate_path(path_argument, path_argument_name):
         raise ValueError("Illegal str argument: {argument_name}".format(
             argument_name=path_argument_name))
     return path_argument
-
-
-def validate_details(details_argument, details_argument_name):
-    """ Validates if the given argument is of type ProjectDetails"""
-
-    if not isinstance(details_argument, ProjectDetails):
-        raise ValueError("Illegal details argument: {argument_name}".format(
-            argument_name=details_argument_name))
-
-    return details_argument
 
 
 def validate_settings(settings_argument):

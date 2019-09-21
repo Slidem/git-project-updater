@@ -39,10 +39,10 @@ class SetSettingsCommand(Command):
 
     def __get_projects_root_directories(self):
         while True:
-            project_root_directories = input(
+            projects_root_directory = input(
                 "Enter project root directory: ")
 
-            if project_root_directories:
-                return project_root_directories
+            if projects_root_directory:
+                return projects_root_directory
             else:
                 print("Project root directories cannot be empty")
