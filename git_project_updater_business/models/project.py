@@ -1,4 +1,3 @@
-from git_project_updater_business.utils.argument_utils import *
 from abc import *
 
 
@@ -9,6 +8,8 @@ class Project(ABC):
         self.project_type = kwargs["project_type"]
         self.path = kwargs["path"]
         self.project_parent_id = kwargs.get("project_parent_id", None)
+        self.children_ids = kwargs.get("children_ids", None)
+        self.dependency_tree = kwargs.get("depdency_tree", None)
 
     def accept(self, visitor):
         if not visitor:
@@ -19,16 +20,6 @@ class Project(ABC):
     @abstractmethod
     def _get_details_str(self):
         pass
-
-    def __add_projects(self, projects, value):
-        if isinstance(value, Project):
-            projects.append(value)
-
-        if isinstance(value, list):
-            for v in value:
-                if not isinstance(v, Project):
-                    raise ValueError("Expected a Project or a list of Project")
-                projects.append(v)
 
     def __str__(self):
         project_str = "------------ Project -------------\n"
