@@ -16,6 +16,7 @@ def print_menu():
     print("1. Set project settings")
     print("2. Print project settings")
     print("3. List projects")
+    print("4. List project children ids")
     print("0. Exit")
     print("========================================================\n")
 

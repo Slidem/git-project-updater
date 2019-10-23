@@ -1,9 +1,9 @@
-from abc import *
-from git_project_updater_business.scanners.converter.maven.maven_processor_chain_factory import MavenProjectProcessorChainFactory
-from git_project_updater_business.models.maven.maven_project import MavenProject
-from git_project_updater_business.models.maven.maven_pom import MavenPom, MavenArtifact
-
 import xmltodict
+
+from git_project_updater_business.models.maven.maven_pom import MavenPom, MavenArtifact
+from git_project_updater_business.models.maven.maven_project import MavenProject
+from git_project_updater_business.scanners.converter.maven.maven_processor_chain_factory import \
+    MavenProjectProcessorChainFactory
 
 
 class PomToProjectConverter:
@@ -19,9 +19,10 @@ class PomToProjectConverter:
             Args:pom_xml_content (TextIOWrapper) : pom content
         """
 
-        # This method only gets the xml content and converts it into a minimal MavenProject instance, and adds it into self.projects
-        maven_pom = self.__build_maven_pom(pom_xml_content)
-        project = self.__create_project_from_maven_pom(maven_pom, pom_path)
+        # This method only gets the xml content and converts it
+        # into a minimal MavenProject instance, and adds it into self.projects
+        maven_pom = self.build_maven_pom(pom_xml_content)
+        project = self.create_project_from_maven_pom(maven_pom, pom_path)
         self.projects[project.project_id] = project
 
     def compute_projects(self):
@@ -29,26 +30,26 @@ class PomToProjectConverter:
         # run each project through a chain of maven project processors
         # that will add additional data to the already existing projects
         # this is done now, as the processors now have access to all computed projects;
-        return MavenProjectProcessorChainFactory().create_chain().process(self.projects)
+        return MavenProjectProcessorChainFactory().create_chain(self.projects).process_projects()
 
-    #################################################################################################################################
-    #################################################################################################################################
+    #################################################################################################
+    #################################################################################################
 
-    def __build_maven_pom(self, pom_xml):
-        parsed_pom = xmltodict.parse(pom_xml.read())["project"]
-        artifact = self.__parse_artifact(parsed_pom)
-        parent_artifact = self.__parse_artifact(parsed_pom.get("parent", None))
-        modules = self.__get_modules(parsed_pom)
+    def build_maven_pom(self, pom_xml):
+        pom_dict = xmltodict.parse(pom_xml.read())["project"]
+        artifact = self.parse_artifact(pom_dict)
+        parent_artifact = self.parse_artifact(pom_dict.get("parent", None))
+        modules = self.get_modules(pom_dict)
 
-        dependencies = self.__get_dependencies(
-            parsed_pom.get("dependencies", None))
+        dependencies = self.get_dependencies(
+            pom_dict.get("dependencies", None))
 
         dependencies_management = {}
-        dependencies_management_node = parsed_pom.get(
+        dependencies_management_node = pom_dict.get(
             "dependencyManagement", None)
 
         if dependencies_management_node:
-            dependencies_management = self.__get_dependencies(
+            dependencies_management = self.get_dependencies(
                 dependencies_management_node["dependencies"])
 
         return MavenPom(
@@ -59,7 +60,7 @@ class PomToProjectConverter:
             dependencies_management=dependencies_management
         )
 
-    def __get_dependencies(self, xml_node):
+    def get_dependencies(self, xml_node):
         if not xml_node:
             return {}
         dependencies = xml_node.get("dependency", None)
@@ -67,12 +68,11 @@ class PomToProjectConverter:
         if not dependencies:
             return {}
 
-        dependencies_artifacts = map(
-            lambda d: self.__parse_artifact(d), dependencies)
+        dependencies_artifacts = map(lambda d: self.parse_artifact(d), dependencies)
         dependencies_artifacts = filter(None, dependencies_artifacts)
         return {a.artifact_id: a for a in dependencies_artifacts}
 
-    def __get_modules(self, parsed_pom):
+    def get_modules(self, parsed_pom):
         modules_node = parsed_pom.get("modules", None)
         if modules_node:
             modules = modules_node.get("module", None)
@@ -80,7 +80,7 @@ class PomToProjectConverter:
                 return modules.copy()
         return []
 
-    def __parse_artifact(self, xml_node):
+    def parse_artifact(self, xml_node):
 
         if not xml_node or not isinstance(xml_node, dict):
             return None
@@ -93,7 +93,7 @@ class PomToProjectConverter:
             version=xml_node.get("version", None)
         )
 
-    def __create_project_from_maven_pom(self, maven_pom, pom_path):
+    def create_project_from_maven_pom(self, maven_pom, pom_path):
         project_id = maven_pom.artifact.artifact_id
         project_parent_id = maven_pom.parent_artifact.artifact_id if maven_pom.parent_artifact else None
         project_type = "maven"

@@ -4,7 +4,6 @@ from git_project_updater_business.visitors.project_dependencies_visitor import D
 
 
 class ProjectsService:
-
     __instance = None
 
     @staticmethod
@@ -21,29 +20,19 @@ class ProjectsService:
             raise Exception("This class is a singleton")
 
     def get_project_ids(self):
-        projects = self.projects_repository.get_projects()
-        if not projects:
+        if not self.projects_repository.projects:
             return []
-        return list(projects.keys())
+        return list(self.projects_repository.projects)
 
     def get_top_level_projects_ids(self):
         """ Returns top level project ids, meaning that projects which belong to a parent will not be shown"""
-        projects = self.projects_repository.get_projects()
+        projects = self.projects_repository.projects
 
-        if not projects:
-            return []
-
-        top_projects_ids = []
-
-        for project_id, project in projects.items():
-            project_parent_id = project.project_parent_id
-            if not projects.get(project_parent_id, None):
-                top_projects_ids.append(project_id)
-
-        return top_projects_ids
+        return map(lambda p: p.project_id,
+                   filter(lambda p: p.project_parent_id not in projects, projects.values())) if projects else []
 
     def get_project_dependencies(self, project_id):
-        project = self.projects_repository.get_projects().get(project_id, None)
+        project = self.projects_repository.projects.get(project_id, None)
         if not project:
             return []
 
@@ -52,16 +41,12 @@ class ProjectsService:
         return dependency_visitor.dependency_ids.copy()
 
     def get_project_children(self, project_id):
-        project = self.projects_repository.get_projects().get(project_id, None)
-        if not project:
-            return []
-
-        children_visitor = ChildrenVisitor(self.projects_repository)
-        project.accept(children_visitor)
-        return children_visitor.children_ids.copy()
+        projects = self.projects_repository.projects
+        project = projects.get(project_id, None)
+        return project.children_ids if project else []
 
     def get_project_details(self, project_id):
-        project = self.projects_repository.get_projects().get(project_id, None)
+        project = self.projects_repository.projects.get(project_id, None)
         if not project:
             return "No details found"
         return str(project)

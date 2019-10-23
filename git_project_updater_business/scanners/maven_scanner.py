@@ -1,14 +1,9 @@
 from git_project_updater_business.scanners.project_scanner import ProjectScanner
-from git_project_updater_business.models.project import Project
-from git_project_updater_business.models.maven.maven_project import MavenProject
-from git_project_updater_business.utils.argument_utils import validate_settings
-from git_project_updater_business.models.maven.maven_pom import MavenPom, MavenArtifact
 from git_project_updater_business.scanners.converter.maven.pom_to_project_converter import PomToProjectConverter
 
 from pathlib import Path
 
 import os
-import xmltodict
 
 
 class MavenProjectsScanner(ProjectScanner):
@@ -33,6 +28,10 @@ class MavenProjectsScanner(ProjectScanner):
                 with open(str(pom_path), encoding="utf8") as pom_xml:
                     pom_to_project_converter.convert_to_project(pom_path, pom_xml)
 
+        # Pass the converted projects to a computation process
+        # Here, projects are "enhanced" with different properties like
+        # - project children ids
+        # - project dependency tree
         return pom_to_project_converter.compute_projects()
 
     def __get_normalized_root_path(self, settings):

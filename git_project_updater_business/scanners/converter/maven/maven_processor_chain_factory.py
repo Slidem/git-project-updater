@@ -3,9 +3,9 @@ from git_project_updater_business.scanners.converter.maven.maven_dependency_tree
 from git_project_updater_business.scanners.converter.project_processor_link_chain import ProjectProcessorLinkChain
 
 
-class MavenProjectProcessorChainFactory():
+class MavenProjectProcessorChainFactory:
 
-    def create_chain():
+    def create_chain(self, projects):
         root = MavenProjectChildrenLink()
         root.add_next(MavenProjectDependencyTreeLink())
-        return ProjectProcessorLinkChain(root)
+        return ProjectProcessorLinkChain(root, projects)

@@ -3,8 +3,8 @@ import json
 from git_project_updater_business.settings.git_credentials import GitCredentials
 from git_project_updater_business.settings.settings import Settings
 
-SETTINGS_JSON_PATH = "{baseFolder}/git_project_updater_business/settings/settings.json".format(
-    baseFolder=os.environ["PYTHONPATH"]
+SETTINGS_JSON_PATH = "{baseFolder}/settings.json".format(
+    baseFolder=os.path.dirname(os.path.realpath(__file__))
 )
 
 GIT_CREDENTIALS_JSON_KEY = "gitCredentials"
@@ -33,7 +33,6 @@ class SettingsRepository:
 
     def get_settings(self):
         """Returns the project updater settings as an `settings instance <settings.Settings>`.
-
         Returns None if no previous settings were set via `set_settings <settings_repository.set_settings>`"""
 
         if SettingsRepository.__settings_cache:

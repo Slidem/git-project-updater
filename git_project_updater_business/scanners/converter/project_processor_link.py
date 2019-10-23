@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
+
 class ProjectProcessorLink(ABC):
 
     def __init__(self):
-        next = None
+        self.next = None
 
     @abstractmethod
     def process(self, projects):

@@ -2,6 +2,7 @@ class ProjectProcessorLinkChain:
 
     def __init__(self, root, projects):
         self.root = root
+        self.projects = projects
 
     def process_projects(self):
         link = self.root

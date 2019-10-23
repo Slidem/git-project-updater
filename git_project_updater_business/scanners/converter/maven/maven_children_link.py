@@ -9,14 +9,12 @@ class MavenProjectChildrenLink(ProjectProcessorLink):
             return projects
 
         for project_id, project in projects.items():
-            self.__add_children(project)
+            maven_pom = project.maven_pom
+            if not maven_pom:
+                return
+
+            project.children_ids = maven_pom.modules.copy()
 
         return projects
 
-    def __add_children(self, project):
 
-        maven_pom = project.maven_pom
-        if not maven_pom:
-            return
-
-        project.children_ids = maven_pom.modules.copy()
