@@ -1,1 +1,8 @@
-{"gitCredentials": {"username": "mihai.v.alexandru@gamilc.om", "password": "0744451501cal"}, "projectsType": "maven", "projectsRootDirectories": "/home/slidem/Development/git-sources"}
+{
+    "gitCredentials": {
+        "username": "mihai.v.alexandru@gamil.com",
+        "password": "0744451501cal"
+    },
+    "projectsType": "maven",
+    "projectsRootDirectories": "/home/slidem/Development/test-project-updater"
+}

@@ -33,9 +33,9 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
             # peek the stack
             node = stack[-1]
 
-            # if node.project_id in depth_memo:
-            #     raise RuntimeError(
-            #         "Circular maven dependency found for artifact id " + node.project_id)
+            if node.project_id in depth_memo:
+                raise RuntimeError(
+                    "Circular maven dependency found for artifact id " + node.project_id)
 
             depth_memo.add(node.project_id)
 
@@ -69,12 +69,15 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
                 if child_id not in projects.keys():
                     continue
                 dependencies_to_solve.update(
-                    self.__get_pom_dependencies(child_id, projects))
+                    self.__get_child_pom_dependencies(child_id, project_id, projects))
 
         dependencies_to_solve.update(
             self.__get_pom_dependencies(project_id, projects))
 
-        return filter(lambda d: d in projects.keys(), dependencies_to_solve)
+        return list(filter(lambda d: d in projects.keys(), dependencies_to_solve))
+
+    def __get_child_pom_dependencies(self, project_id, parent_id, projects):
+        return list(filter(lambda pid: projects[pid].project_parent_id != parent_id, self.__get_pom_dependencies(project_id, parent_id)))
 
     def __get_pom_dependencies(self, project_id, projects):
         return list(projects[project_id].maven_pom.dependencies.keys())
