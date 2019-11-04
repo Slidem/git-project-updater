@@ -1,6 +1,5 @@
 from git_project_updater_business.models.maven.maven_project import MavenProject
 
-
 class DependenciesVisitor:
 
     def __init__(self, projects_repository):

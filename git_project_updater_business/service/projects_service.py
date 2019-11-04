@@ -28,8 +28,10 @@ class ProjectsService:
         """ Returns top level project ids, meaning that projects which belong to a parent will not be shown"""
         projects = self.projects_repository.projects
 
-        return map(lambda p: p.project_id,
-                   filter(lambda p: p.project_parent_id not in projects, projects.values())) if projects else []
+        if not projects:
+            return []
+
+        return map(lambda p: p.project_id, filter(lambda p: p.project_parent_id not in projects, projects.values()))
 
     def get_project_dependencies(self, project_id):
         project = self.projects_repository.projects.get(project_id, None)
