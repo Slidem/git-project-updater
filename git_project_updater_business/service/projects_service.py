@@ -1,5 +1,4 @@
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
-from git_project_updater_business.visitors.project_children_visitor import ChildrenVisitor
 from git_project_updater_business.visitors.project_dependencies_visitor import DependenciesVisitor
 
 

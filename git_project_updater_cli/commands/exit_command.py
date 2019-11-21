@@ -6,5 +6,8 @@ class ExitCommand(Command):
     def execute(self):
         sys.exit()
 
+    def command(self):
+        return "0"
+
     def __str__(self):
         return "Exiting..."

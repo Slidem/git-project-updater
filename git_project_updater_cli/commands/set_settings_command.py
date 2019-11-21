@@ -12,13 +12,16 @@ class SetSettingsCommand(Command):
         projects_type = self.__get_projects_type()
         projects_root_directories = self.__get_projects_root_directories()
 
-        SettingsRepository.get_instance().set_settings(
+        super().settings_repository().set_settings(
             Settings(
                 git_credentials,
                 projects_root_directories,
                 projects_type
             )
         )
+
+    def code(self):
+        return "1"
 
     def __str__(self):
         return "=== Set settings ==="

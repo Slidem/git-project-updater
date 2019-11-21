@@ -7,8 +7,11 @@ from git_project_updater_business.scanners.projects_scanner_factory import Proje
 
 class ListProjectsCommand(Command):
     def execute(self):
-        project_ids = self.get_projects_service().get_top_level_projects_ids()
+        project_ids = super().projects_service.get_top_level_projects_ids()
         print(*project_ids, sep="\n")
+
+    def code(self):
+        return "3"
 
     def __str__(self):
         return "=== Projects list ==="

@@ -4,11 +4,14 @@ from git_project_updater_business.settings.settings_repository import SettingsRe
 
 class PrintCommand(Command):
     def execute(self):
-        settings = SettingsRepository.get_instance().get_settings()
+        settings = super().settings_repository.get_settings()
         if settings:
             print(settings)
         else:
             print("Settings have not been set yet !")
+
+    def code(self):
+        return "2"
 
     def __str__(self):
         return "=== Settings ==="
