@@ -1,11 +1,11 @@
-from git_project_updater_cli.commands.command_factory import create_command
+from git_project_updater_cli.commands import command_factory
 
 
 def main():
     while True:
         print_menu()
         command_number = input("Enter action number:")
-        command = create_command(command_number)
+        command = command_factory.create_command(command_number)
         print(f"\n{command}")
         command.execute()
 

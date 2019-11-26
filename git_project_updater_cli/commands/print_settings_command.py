@@ -2,7 +2,10 @@ from git_project_updater_cli.commands.command import Command
 from git_project_updater_business.settings.settings_repository import SettingsRepository
 
 
-class PrintCommand(Command):
+class PrintSettingsCommand(Command):
+
+    PRINT_SETTINGS_COMMAND_CODE = "2"
+
     def execute(self):
         settings = super().settings_repository.get_settings()
         if settings:
@@ -10,8 +13,9 @@ class PrintCommand(Command):
         else:
             print("Settings have not been set yet !")
 
+    @property
     def code(self):
-        return "2"
+        return PrintSettingsCommand.PRINT_SETTINGS_COMMAND_CODE
 
     def __str__(self):
         return "=== Settings ==="

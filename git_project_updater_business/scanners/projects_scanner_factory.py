@@ -1,6 +1,5 @@
 from git_project_updater_business.settings.settings_repository import SettingsRepository
 from git_project_updater_business.scanners.maven_scanner import MavenProjectsScanner
-from git_project_updater_business.scanners.empty_project_scanner import EmptyProjectScanner
 
 
 class ProjectScannerFactory:
@@ -25,4 +24,5 @@ class ProjectScannerFactory:
         if projects_type == "maven":
             return MavenProjectsScanner()
         else:
-            return EmptyProjectScanner()
+            raise ValueError(
+                f"No project scanners found for project_type {projects_type}")

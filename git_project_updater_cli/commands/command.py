@@ -9,16 +9,12 @@ from git_project_updater_cli.commands import command_factory
 
 class Command(ABC):
 
-    def __init__(self):
-        print(f"Registering {self.__name__} with code {self.code}")
-        command_factory.register_command(self)
-
     @abstractmethod
     def execute(self):
         pass
 
-    @abstractmethod
     @property
+    @abstractmethod
     def code(self):
         pass
 

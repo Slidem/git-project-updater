@@ -1,5 +1,5 @@
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
-from git_project_updater_business.visitors.project_dependencies_visitor import DependenciesVisitor
+from git_project_updater_business.utils.node_dependency_tree_traversal import createDependencyTreeNodeTraversalStrategy
 
 
 class ProjectsService:
@@ -32,15 +32,6 @@ class ProjectsService:
 
         return map(lambda p: p.project_id, filter(lambda p: p.project_parent_id not in projects, projects.values()))
 
-    def get_project_dependencies(self, project_id):
-        project = self.projects_repository.projects.get(project_id, None)
-        if not project:
-            return []
-
-        dependency_visitor = DependenciesVisitor(self.projects_repository)
-        project.accept(dependency_visitor)
-        return dependency_visitor.dependency_ids.copy()
-
     def get_project_children(self, project_id):
         projects = self.projects_repository.projects
         project = projects.get(project_id, None)
@@ -51,6 +42,16 @@ class ProjectsService:
         if not project:
             return "No details found"
         return str(project)
+
+    def traverse_project_dependency_tree(self, project_id, traversal_type, node_traversal_observer):
+        
+        traversal_strategy = createDependencyTreeNodeTraversalStrategy(
+            traversal_type,
+            node_traversal_observer
+        )
+
+        project = self.projects_repository.projects[project_id]
+        traversal_strategy.traverse(project.dependency_tree)
 
     def get_project_version(self, project_id):
         pass

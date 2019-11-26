@@ -75,11 +75,12 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
         project = projects[project_id]
 
         if project.maven_pom.is_parent():
-            for child_id in project.children_ids:
-                if child_id in projects.keys():
-                    child_dependencies = self.__get_pom_dependencies(
-                        child_id, projects)
-                    dependencies_to_solve.update(child_dependencies)
+
+            for project_child_dependencies in [
+                    self.__get_pom_dependencies(project_child_id, projects) for project_child_id in
+                    [child_id for child_id in project.children_ids if child_id in project.keys()]]:
+
+                dependencies_to_solve.update(project_child_dependencies)
 
         dependencies_to_solve.update(
             self.__get_pom_dependencies(project_id, projects))
@@ -89,17 +90,16 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
     def __get_pom_dependencies(self, project_id, projects):
         if project_id not in projects.keys():
             return []
-
         project_parent_id = projects[project_id].project_parent_id
 
-        def is_local_project_filter(pid): return pid in projects.keys()
+        def is_local_project(pid): return pid in projects.keys()
 
         def does_not_have_the_same_parent(pid):
             return not project_parent_id or (project_parent_id in projects.keys() and projects[pid].project_parent_id != project_parent_id)
 
-        filters = (is_local_project_filter, does_not_have_the_same_parent)
-
-        return list(filter(lambda pid: all(f(pid) for f in filters), projects[project_id].maven_pom.dependencies.keys()))
+        dependencies_ids = projects[project_id].maven_pom.dependencies.keys(
+        )
+        return [pid for pid in dependencies_ids if is_local_project(pid) and does_not_have_the_same_parent(pid)]
 
     def __check_for_circular_dependency(self, id, depth_memo):
         if id in depth_memo:

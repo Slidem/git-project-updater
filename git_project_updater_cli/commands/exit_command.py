@@ -3,11 +3,15 @@ import sys
 
 
 class ExitCommand(Command):
+
+    EXIT_CODE = "0"
+
     def execute(self):
         sys.exit()
 
-    def command(self):
-        return "0"
+    @property
+    def code(self):
+        return ExitCommand.EXIT_CODE
 
     def __str__(self):
         return "Exiting..."

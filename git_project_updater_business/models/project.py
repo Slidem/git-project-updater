@@ -7,6 +7,8 @@ class Project(ABC):
         self.project_id = kwargs["project_id"]
         self.project_type = kwargs["project_type"]
         self.path = kwargs["path"]
+
+        # optional fields
         self.project_parent_id = kwargs.get("project_parent_id", None)
         self.children_ids = kwargs.get("children_ids", None)
         self.dependency_tree = kwargs.get("depdency_tree", None)

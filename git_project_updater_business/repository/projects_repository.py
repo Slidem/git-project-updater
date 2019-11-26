@@ -1,8 +1,14 @@
+import logging
+
+from git_project_updater_business.settings.settings_repository import SettingsRepository
+from git_project_updater_business.scanners.projects_scanner_factory import ProjectScannerFactory
+
+
 class ProjectsRepository:
     __instance = None
 
     @staticmethod
-    def get_instance(settings_repository, project_scanner_factory):
+    def get_instance(settings_repository: SettingsRepository, project_scanner_factory: ProjectScannerFactory):
         if ProjectsRepository.__instance is None:
             ProjectsRepository(settings_repository, project_scanner_factory)
         return ProjectsRepository.__instance
@@ -26,10 +32,13 @@ class ProjectsRepository:
     def refresh_projects(self):
         self.__read_projects()
 
+    # --------------------------------------------- PRIVATE METHODS
+
     def __read_projects(self):
+        logging.info("Reading projects...")
         settings = self.settings_repository.get_settings()
         if not settings:
-            print("Warning! Settings have not been set yet, projects will be empty")
+            logging.error("No settings found in repository")
         else:
             self.__projects = self.project_scanner_factory.compute_scanner(
                 settings).scan_for_projects(settings)

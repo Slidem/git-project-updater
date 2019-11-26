@@ -26,13 +26,13 @@ class MavenProjectsScanner(ProjectScanner):
 
                 # open pom file, and parse it into a MavenPom instance
                 with open(str(pom_path), encoding="utf8") as pom_xml:
-                    pom_to_project_converter.convert_to_project(pom_path, pom_xml)
+                    pom_to_project_converter.collect_and_convert(pom_path, pom_xml)
 
         # Pass the converted projects to a computation process
         # Here, projects are "enhanced" with different properties like
         # - project children ids
         # - project dependency tree
-        return pom_to_project_converter.compute_projects()
+        return pom_to_project_converter.compute_collected_projects()
 
     def __get_normalized_root_path(self, settings):
         return str(Path(settings.projects_root_directory))

@@ -1,3 +1,10 @@
+from collections import namedtuple
+
+
+MavenArtifact = namedtuple(
+    "MavenArtifact", "artifact_id group_id version scope packaging")
+
+
 class MavenPom:
     def __init__(self, **kwargs):
         self.artifact = kwargs.get("artifact", None)
@@ -54,15 +61,3 @@ class MavenPom:
         for key, value in d.items():
             if not isinstance(value, dict_value_type):
                 return False
-
-
-class MavenArtifact:
-    def __init__(self, **kwargs):
-        self.artifact_id = kwargs.get("artifact_id", None)
-        self.group_id = kwargs.get("group_id", None)
-        self.version = kwargs.get("version", None)
-        self.scope = kwargs.get("scope", None)
-        self.packaging = kwargs.get("packaging", None)
-
-    def __str__(self):
-        return "artifact id: " + self.artifact_id + "\n" + "group id: " + self.group_id + "\n" + "version: " + self.version + "\n" + "scope: " + self.scope
