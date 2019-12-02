@@ -3,25 +3,41 @@ from abc import ABC, abstractmethod
 from git_project_updater_business.models.project_dependency_tree_node import ProjectDependencyTreeNode
 
 
-# traversal strategy factory
-
-def createDependencyTreeNodeTraversalStrategy(traversal_type: TraversalStrategyType, traversal_node_observer: NodeTraversalObserver) -> ProjectDependencyTreeNodeTraversalStrategy:
-    if traversal_type == TraversalStrategyType.BFS:
-        return BFSTraversalStrategy(traversal_node_observer)
-    if traversal_type == TraversalStrategyType.DFS:
-        return DFSTraversalStrategy(traversal_node_observer)
-    raise ValueError("No valid traversal strategy type passed")
-
-
 # strategies.....
 class TraversalStrategyType(Enum):
     DFS = auto()
     BFS = auto()
 
 
+class TraversalSate:
+    def __init__(self, level: int, parent: ProjectDependencyTreeNode, node: ProjectDependencyTreeNode):
+        self.level = level
+        self.parent = parent
+        self.node = node
+
+
+class NodeTraversalObserver(ABC):
+
+    @abstractmethod
+    def node_visited(self, traversal_state: TraversalSate):
+        pass
+
+
+class ProjectDependencyTreeNodeTraversalStrategy(ABC):
+
+    def __init__(self, node_traversal_observer: NodeTraversalObserver):
+        if not node_traversal_observer:
+            raise ValueError("Node traversal observer is mandatory")
+        self.node_traversal_observer = node_traversal_observer
+
+    @abstractmethod
+    def traverse(self, root: ProjectDependencyTreeNode):
+        pass
+
+
 class DFSTraversalStrategy(ProjectDependencyTreeNodeTraversalStrategy):
 
-    def __init__(self, node_traversal_observer):
+    def __init__(self, node_traversal_observer: NodeTraversalObserver):
         super().__init__(node_traversal_observer)
 
     def traverse(self, root):
@@ -56,28 +72,12 @@ class BFSTraversalStrategy(ProjectDependencyTreeNodeTraversalStrategy):
                 stack.append(TraversalSate(
                     node_state.level+1, node_state, child))
 
-
-class ProjectDependencyTreeNodeTraversalStrategy(ABC):
-
-    def __init__(self, node_traversal_observer: NodeTraversalObserver):
-        if not node_traversal_observer:
-            raise ValueError("Node traversal observr is mandatory")
-        self.node_traversal_observer = node_traversal_observer
-
-    @abstractmethod
-    def traverse(self, root: ProjectDependencyTreeNode):
-        pass
+# traversal strategy factory
 
 
-class NodeTraversalObserver(ABC):
-
-    @abstractmethod
-    def node_visited(self, traversal_state: TraversalSate):
-        pass
-
-
-class TraversalSate:
-    def __init__(self, level, parent_node: ProjectDependencyTreeNode, node: ProjectDependencyTreeNode):
-        self.level = level
-        self.parent_node = parent_node
-        self.node = node
+def createDependencyTreeNodeTraversalStrategy(traversal_type: TraversalStrategyType, traversal_node_observer: NodeTraversalObserver) -> ProjectDependencyTreeNodeTraversalStrategy:
+    if traversal_type == TraversalStrategyType.BFS:
+        return BFSTraversalStrategy(traversal_node_observer)
+    if traversal_type == TraversalStrategyType.DFS:
+        return DFSTraversalStrategy(traversal_node_observer)
+    raise ValueError("No valid traversal strategy type passed")

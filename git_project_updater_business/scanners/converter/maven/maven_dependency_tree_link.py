@@ -43,7 +43,10 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
 
                 solved_projects_ids.add(node.project_id)
                 stack.pop()
-                depth_memo.remove(node.project_id)
+
+                if node.project_id in depth_memo:
+                    depth_memo.remove(node.project_id)
+
                 continue
 
             # add dependencies to stack
@@ -55,7 +58,8 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
                 stack.append(dependency_node)
 
                 # detect circular dependency
-                self.__check_for_circular_dependency(dependency_id, depth_memo)
+                self.__check_for_circular_dependency(
+                    dependency_id, depth_memo, solved_projects_ids)
                 depth_memo.add(dependency_id)
 
                 # save parent mapping
@@ -78,7 +82,7 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
 
             for project_child_dependencies in [
                     self.__get_pom_dependencies(project_child_id, projects) for project_child_id in
-                    [child_id for child_id in project.children_ids if child_id in project.keys()]]:
+                    [child_id for child_id in project.children_ids if child_id in projects.keys()]]:
 
                 dependencies_to_solve.update(project_child_dependencies)
 
@@ -92,17 +96,19 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
             return []
         project_parent_id = projects[project_id].project_parent_id
 
+        # checks if a dependency is a project under the defined root project paths
         def is_local_project(pid): return pid in projects.keys()
 
+        # checks to see if a dependency does not have the same parent
         def does_not_have_the_same_parent(pid):
-            return not project_parent_id or (project_parent_id in projects.keys() and projects[pid].project_parent_id != project_parent_id)
+            return not project_parent_id or project_parent_id not in projects.keys() or (project_parent_id in projects.keys() and projects[pid].project_parent_id != project_parent_id)
 
-        dependencies_ids = projects[project_id].maven_pom.dependencies.keys(
-        )
+        dependencies_ids = projects[project_id].maven_pom.dependencies.keys()
+        # return the project ids based on the two filters above
         return [pid for pid in dependencies_ids if is_local_project(pid) and does_not_have_the_same_parent(pid)]
 
-    def __check_for_circular_dependency(self, id, depth_memo):
-        if id in depth_memo:
+    def __check_for_circular_dependency(self, id, depth_memo, solved_projects_ids):
+        if id in depth_memo and id not in solved_projects_ids:
             raise RuntimeError(
                 "Circular maven dependency found for artifact id " + id)
 

@@ -7,7 +7,7 @@ class PrintSettingsCommand(Command):
     PRINT_SETTINGS_COMMAND_CODE = "2"
 
     def execute(self):
-        settings = super().settings_repository.get_settings()
+        settings = super().settings_repository.settings
         if settings:
             print(settings)
         else:

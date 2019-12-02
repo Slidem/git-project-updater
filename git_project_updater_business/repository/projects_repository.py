@@ -36,7 +36,7 @@ class ProjectsRepository:
 
     def __read_projects(self):
         logging.info("Reading projects...")
-        settings = self.settings_repository.get_settings()
+        settings = self.settings_repository.settings
         if not settings:
             logging.error("No settings found in repository")
         else:
