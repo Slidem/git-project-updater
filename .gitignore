@@ -4,3 +4,4 @@ env
 .pytest_cache
 .coverage
 .vscode
+./git_project_updater_business/settings/settings.json
