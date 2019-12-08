@@ -1,5 +1,6 @@
 from git_project_updater_business.scanners.converter.project_processor_link import ProjectProcessorLink
 from git_project_updater_business.models.project_dependency_tree_node import ProjectDependencyTreeNode
+import copy
 
 
 class MavenProjectDependencyTreeLink(ProjectProcessorLink):
@@ -68,7 +69,7 @@ class MavenProjectDependencyTreeLink(ProjectProcessorLink):
     def __build_node_wrapper(self, id, projects, resolved_projects):
         dependency_node = None
         if id in resolved_projects:
-            dependency_node = projects[id].dependency_tree
+            dependency_node = copy.deepcopy(projects[id].dependency_tree)
         dependencies_to_solve = self.__get_dependencies_to_solve(id, projects)
         return DependencyTreeNodeWrapper(id, dependencies_to_solve, dependency_node)
 
@@ -118,7 +119,7 @@ class DependencyTreeNodeWrapper:
     def __init__(self, project_id, dependencies_to_solve, dependecy_node):
         self.project_id = project_id
         self.dependecy_node = dependecy_node if dependecy_node else ProjectDependencyTreeNode(
-            project_id, None)
+            project_id)
         self.dependencies_to_solve = dependencies_to_solve
 
         if not dependencies_to_solve:

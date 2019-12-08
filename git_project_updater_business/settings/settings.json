@@ -1,8 +1,8 @@
 {
     "gitCredentials": {
-        "username": "",
-        "password": ""
+        "username": "mihai.v.alexandru@gamil.com",
+        "password": "0744451501cal"
     },
-    "projectsType": "",
-    "projectsRootDirectories": ""
+    "projectsType": "maven",
+    "projectsRootDirectories": "/home/slidem/Development/git-sources/file-sharing-platform"
 }

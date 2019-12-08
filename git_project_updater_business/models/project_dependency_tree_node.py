@@ -3,14 +3,28 @@ from typing import Dict, Any, TypeVar
 
 class ProjectDependencyTreeNode:
 
-    def __init__(self, project_id: str, children: Dict[str, "ProjectDependencyTreeNode"]):
+    def __init__(self, project_id: str):
         self.project_id = project_id
-        self.__children = children if children else {}
+        self.__children = {}
+        self.__children_versions = {}
 
     def add_child(self, node: "ProjectDependencyTreeNode"):
         if not node:
             raise ValueError("Cannot add a null node as a child")
         self.__children[node.project_id] = node
+
+    def set_child_version(self, child_id, version):
+        if child_id not in self.__children:
+            raise ValueError(
+                "Cannot set version. Child not found for the given node")
+
+        self.__children_versions[child_id] = version
+
+    def get_child_version(self, child_id):
+        if child_id not in self.__children_versions:
+            return None
+
+        return self.__children_versions[child_id]
 
     def get_child(self, project_id):
         return self.__children[project_id]

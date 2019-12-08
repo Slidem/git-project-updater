@@ -30,7 +30,7 @@ class ProjectsService:
         if not projects:
             return []
 
-        return map(lambda p: p.project_id, filter(lambda p: p.project_parent_id not in projects, projects.values()))
+        return [p.project_id for p in projects.values() if p.project_parent_id not in projects]
 
     def get_project_children(self, project_id):
         projects = self.projects_repository.projects
@@ -44,7 +44,7 @@ class ProjectsService:
         return str(project)
 
     def traverse_project_dependency_tree(self, project_id, traversal_type, node_traversal_observer):
-        
+
         traversal_strategy = createDependencyTreeNodeTraversalStrategy(
             traversal_type,
             node_traversal_observer

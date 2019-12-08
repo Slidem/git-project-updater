@@ -73,8 +73,6 @@ class BFSTraversalStrategy(ProjectDependencyTreeNodeTraversalStrategy):
                     node_state.level+1, node_state, child))
 
 # traversal strategy factory
-
-
 def createDependencyTreeNodeTraversalStrategy(traversal_type: TraversalStrategyType, traversal_node_observer: NodeTraversalObserver) -> ProjectDependencyTreeNodeTraversalStrategy:
     if traversal_type == TraversalStrategyType.BFS:
         return BFSTraversalStrategy(traversal_node_observer)

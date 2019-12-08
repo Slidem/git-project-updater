@@ -7,6 +7,7 @@ class Project(ABC):
         self.project_id = kwargs["project_id"]
         self.project_type = kwargs["project_type"]
         self.path = kwargs["path"]
+        self.version = "UNKOWN"
 
         # optional fields
         self.project_parent_id = kwargs.get("project_parent_id", None)

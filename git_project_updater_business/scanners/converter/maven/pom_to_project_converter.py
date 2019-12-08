@@ -4,6 +4,7 @@ from git_project_updater_business.models.maven.maven_pom import MavenPom, MavenA
 from git_project_updater_business.models.maven.maven_project import MavenProject
 from git_project_updater_business.scanners.converter.maven.maven_processor_chain_factory import \
     MavenProjectProcessorChainFactory
+from git_project_updater_business.errors.updater_errors import MultiplePropertiesDefined
 
 
 class PomToProjectConverter:
@@ -41,6 +42,7 @@ class PomToProjectConverter:
         artifact = self.__parse_artifact(pom_dict)
         parent_artifact = self.__parse_artifact(pom_dict.get("parent", None))
         modules = self.__get_modules(pom_dict)
+        properties = self.__get_valid_pom_properties(pom_dict)
 
         dependencies = self.__get_dependencies(
             pom_dict.get("dependencies", None))
@@ -58,7 +60,8 @@ class PomToProjectConverter:
             parent_artifact=parent_artifact,
             modules=modules,
             dependencies=dependencies,
-            dependencies_management=dependencies_management
+            dependencies_management=dependencies_management,
+            properties=properties
         )
 
     def __get_dependencies(self, xml_node):
@@ -106,3 +109,15 @@ class PomToProjectConverter:
             project_type=project_type,
             path=pom_path
         )
+
+    def __get_valid_pom_properties(self, pom_dict):
+        properties = pom_dict.get("properties", None)
+        if not properties:
+            return {}
+
+        for property_key, property_value in properties.items():
+            if isinstance(property_value, list):
+                raise MultiplePropertiesDefined(
+                    f"Multiple versions defined for artifact_id {pom_dict.get('artifactId', None)} for property {property_key} : {property_value}")
+
+        return properties
