@@ -54,10 +54,18 @@ class ProjectsService:
         traversal_strategy.traverse(project.dependency_tree)
 
     def get_project_version(self, project_id):
-        pass
+        project = self.projects_repository.projects.get(project_id, None)
+        return project.version if project else "UNKOWN"
 
     def get_version_used(self, project_id, project_used_in_id):
-        pass
+        projects = self.projects_repository.projects
+        project_used_in = projects.get(project_used_in_id, None)
+        if not project_used_in:
+            return "UNKOWN"
+
+        version_used = project_used_in.dependency_tree.get_child_version(
+            project_id)
+        return version_used if version_used else "UNKOWN"
 
     def change_version(self, project_id, for_project_id, version):
         pass

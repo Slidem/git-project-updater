@@ -18,6 +18,8 @@ def print_menu():
     print("3. List projects")
     print("4. List project children ids")
     print("5. Print project dependency tree")
+    print("6. Get project version")
+    print("7. Get project version used in...")
     print("0. Exit")
     print("========================================================\n")
 

@@ -3,10 +3,15 @@ from git_project_updater_cli.commands.print_settings_command import PrintSetting
 from git_project_updater_cli.commands.list_projects_command import ListProjectsCommand
 from git_project_updater_cli.commands.list_project_children_command import ListProjectChildrenIds
 from git_project_updater_cli.commands.deptree_command import ProjectDependencyTreeCommand
+from git_project_updater_cli.commands.project_version_command import ProjectVersionCommand
+from git_project_updater_cli.commands.project_version_command_used_in import ProjectVersionUsedInCommand
 from git_project_updater_cli.commands.exit_command import ExitCommand
+from git_project_updater_cli.commands.unknown_command import UnkownCommand
 
 
 COMMANDS_REGISTRY = {}
+
+DEFAULT_COMMAND = UnkownCommand()
 
 
 def register_command(command):
@@ -22,6 +27,8 @@ def register_commands():
     register_command(ListProjectsCommand())
     register_command(ListProjectChildrenIds())
     register_command(ProjectDependencyTreeCommand())
+    register_command(ProjectVersionCommand())
+    register_command(ProjectVersionUsedInCommand())
     register_command(ExitCommand())
 
 
@@ -48,9 +55,5 @@ def create_command(command_code):
     if not COMMANDS_REGISTRY:
         register_commands()
 
-    command = COMMANDS_REGISTRY.get(command_code)
-    if not command:
-        raise ValueError(
-            f"Command not found in registry for command code: {command_code}")
-
-    return command
+    command = COMMANDS_REGISTRY.get(command_code.strip())
+    return command if command else DEFAULT_COMMAND
