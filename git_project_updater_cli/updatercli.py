@@ -20,6 +20,7 @@ def print_menu():
     print("5. Print project dependency tree")
     print("6. Get project version")
     print("7. Get project version used in...")
+    print("8. Get project git info")
     print("0. Exit")
     print("========================================================\n")
 

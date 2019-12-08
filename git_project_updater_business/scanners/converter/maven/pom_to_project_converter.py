@@ -1,5 +1,6 @@
 import xmltodict
 
+
 from git_project_updater_business.models.maven.maven_pom import MavenPom, MavenArtifact
 from git_project_updater_business.models.maven.maven_project import MavenProject
 from git_project_updater_business.scanners.converter.maven.maven_processor_chain_factory import \
@@ -102,12 +103,13 @@ class PomToProjectConverter:
         project_id = maven_pom.artifact.artifact_id
         project_parent_id = maven_pom.parent_artifact.artifact_id if maven_pom.parent_artifact else None
         project_type = "maven"
+        path = pom_path.parents[0]
         return MavenProject(
             maven_pom=maven_pom,
             project_id=project_id,
             project_parent_id=project_parent_id,
             project_type=project_type,
-            path=pom_path
+            path=path
         )
 
     def __get_valid_pom_properties(self, pom_dict):

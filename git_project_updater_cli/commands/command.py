@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from git_project_updater_business.settings.settings_repository import SettingsRepository
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
 from git_project_updater_business.service.projects_service import ProjectsService
+from git_project_updater_business.service.git_service import GitService
 from git_project_updater_business.scanners.projects_scanner_factory import ProjectScannerFactory
 from git_project_updater_cli.commands import command_factory
 
@@ -29,6 +30,10 @@ class Command(ABC):
     @property
     def projects_service(self):
         return ProjectsService.get_instance(self.projects_repository)
+
+    @property
+    def git_service(self):
+        return GitService.get_instance(self.projects_repository)
 
     def __str__(self):
         "Unkown command"
