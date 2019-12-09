@@ -1,4 +1,5 @@
 from git_project_updater_cli.commands.command import Command
+from git_project_updater_business.models.git.git_model import git_info_to_str
 
 
 class GitInfoCommand(Command):
@@ -7,9 +8,7 @@ class GitInfoCommand(Command):
 
     def execute(self):
         project_id = input("Print git info for project id:")
-        git_info = self.git_service.get_git_info(project_id)
-        # TODO print it
-        print(git_info)
+        print(git_info_to_str(self.git_service.get_git_info(project_id)))
 
     @property
     def code(self):
