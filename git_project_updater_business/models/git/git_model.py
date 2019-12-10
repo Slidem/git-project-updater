@@ -38,3 +38,4 @@ def git_info_to_str(git_info):
     {new_str}
     {deleted_str}
     """
+GIT_MERGE_ANALYSIS_FASTFORWARD
