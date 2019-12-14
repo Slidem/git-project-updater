@@ -138,8 +138,24 @@ class GitService:
 
         return GitFilesStatus(modified, new, deleted)
 
-# TODO implement methods to observer git update process
-
-
 class GitProcessObserver(ABC):
-    pass
+
+    @abstractmethod
+    def fetching(self):
+        pass
+    
+    @abstractmethod
+    def fetching_finished(self):
+        pass
+
+    @abstractmethod
+    def up_to_date(self):
+        pass
+
+    @abstractmethod
+    def performed_fast_forward(self):
+        pass
+
+    @abstractmethod
+    def could_not_update_current_branch(self):
+        pass

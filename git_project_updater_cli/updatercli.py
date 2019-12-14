@@ -21,6 +21,7 @@ def print_menu():
     print("6. Get project version")
     print("7. Get project version used in...")
     print("8. Get project git info")
+    print("9. Update project git sources")
     print("0. Exit")
     print("========================================================\n")
 
