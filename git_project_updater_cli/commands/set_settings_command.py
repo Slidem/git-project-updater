@@ -35,7 +35,7 @@ class SetSettingsCommand(Command):
 
 class SettingsInputUtil:
     """
-    Utility class to get console input from the user regarind:
+    Utility class to get console input from the user regarding:
     - git credentials
     - projects type : maven / gradle / ....
     - projects root directory 

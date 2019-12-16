@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
 from git_project_updater_business.models.git.git_model import *
 from git_project_updater_business.utils.date_utils import millis_to_date
+from git_project_updater_business.errors.git_errors import GitError 
+
 
 from pygit2 import Repository
 from pygit2 import GitError
@@ -32,6 +34,24 @@ class GitService:
             raise Exception("This class is a singleton")
 
     def get_git_info(self, project_id):
+        """
+        Retrives a project's git info project based on the project_id
+
+        Parameters
+        ----------
+        
+        project_id : str
+            The project id to retrieve the info
+
+        Returns
+        -------
+            GitInfo instance containing the git info for the given project id
+
+        Raises
+        ------
+            ValueError if no project found for the given project_id  
+            GitError if no git repo found for the given project_id
+        """
         project = self.__try_get_project(project_id)
 
         repo = self.__get_repo(project)
@@ -43,11 +63,33 @@ class GitService:
         )
 
     def update_git_sources(self, project_id, git_process_observer):
+        """
+        Updates a project's git sources based on the project_id
+
+        Parameters
+        ----------
+        
+        project_id : str
+            The project id to be updated
+
+        git_process_observer : GitProcessObserver
+            Instance of GitProcessObserver implementation, that listens to events
+            during the update process
+
+        Returns
+        -------
+            GitInfo instance containing the git info for the given project id
+
+        Raises
+        ------
+            ValueError if no project found for the given project_id  
+            GitError if no git repo found for the given project_id
+        """
+
         project = self.__try_get_project(project_id)
         repo = self.__get_repo(project)
 
-        current_branch_name = repo.head.shorthand
-        remote = repo.remotes[current_branch_name]
+        remote = repo.remotes["origin"]
 
         # first fetch remotes for current branch
         git_process_observer.fetching()
@@ -55,8 +97,9 @@ class GitService:
         git_process_observer.fetching_finished()
 
         # perform merge analasys (what would happen if merging current remote into local branch)
+        current_branch_name = repo.head.shorthand
         remote_id = repo.lookup_reference(
-            f'refs/remotes/{remote.name}/{current_branch_name}')
+            f'refs/remotes/{remote.name}/{current_branch_name}').target
         merge_result, _ = repo.merge_analysis(remote_id)
 
         # analyze merge result
@@ -67,15 +110,14 @@ class GitService:
         elif merge_result & GIT_MERGE_ANALYSIS_FASTFORWARD:
             repo.checkout_tree(repo.get(remote_id))
             try:
-                master_ref = repo.lookup_reference(
-                    'refs/heads/%s' % (current_branch_name))
+                master_ref = repo.lookup_reference(f'refs/heads/{current_branch_name}')
                 master_ref.set_target(remote_id)
             except KeyError:
                 repo.create_branch(current_branch_name, repo.get(remote_id))
             repo.head.set_target(remote_id)
             git_process_observer.performed_fast_forward()
         else:
-            git_process_observer.could_not_update_current_branch(branch)
+            git_process_observer.could_not_update_current_branch(current_branch_name)
 
     def __try_get_project(self, project_id):
         project = self.projects_repository.projects.get(project_id, None)
@@ -98,7 +140,7 @@ class GitService:
                 path = path.parents[1].joinpath(".git")
 
         if not repo:
-            raise ValueError("Could not find repo for ")
+            raise GitError(f"Could not find repo for project_id {project.project_id}")
 
         return repo
 
@@ -157,5 +199,5 @@ class GitProcessObserver(ABC):
         pass
 
     @abstractmethod
-    def could_not_update_current_branch(self):
+    def could_not_update_current_branch(self, branch_name):
         pass
