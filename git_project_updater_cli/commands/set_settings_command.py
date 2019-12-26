@@ -11,11 +11,11 @@ class SetSettingsCommand(Command):
 
     def execute(self):
 
-        setting_input_util = SettingsInputUtil()
+        settings_input_util = SettingsInputUtil()
 
-        git_credentials = setting_input_util.git_credentials
-        projects_type = setting_input_util.projects_type
-        projects_root_directories = setting_input_util.projects_root
+        git_credentials = settings_input_util.git_credentials
+        projects_type = settings_input_util.projects_type
+        projects_root_directories = settings_input_util.projects_root
 
         super().settings_repository().set_settings(
             Settings(

@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import enum, auto
 from abc import ABC, abstractmethod
 from git_project_updater_business.models.project_dependency_tree_node import ProjectDependencyTreeNode
 

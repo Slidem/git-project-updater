@@ -1,5 +1,6 @@
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
 from git_project_updater_business.utils.node_dependency_tree_traversal import createDependencyTreeNodeTraversalStrategy
+from git_project_updater_business.builders.builders_factory import get_builder
 
 
 class ProjectsService:
@@ -67,5 +68,13 @@ class ProjectsService:
             project_id)
         return version_used if version_used else "UNKOWN"
 
+    def build_project(self, project_id, *mnv_commands):
+        projects = self.projects_repository.projects
+        project = projects.get(project_id, None)
+        get_builder(project).build(project, mnv_commands)
+
+    # TODO 
     def change_version(self, project_id, for_project_id, version):
         pass
+
+    

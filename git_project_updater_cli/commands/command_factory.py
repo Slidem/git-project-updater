@@ -9,6 +9,7 @@ from git_project_updater_cli.commands.exit_command import ExitCommand
 from git_project_updater_cli.commands.unknown_command import UnkownCommand
 from git_project_updater_cli.commands.git_info_command import GitInfoCommand
 from git_project_updater_cli.commands.git_update_command import GitUpdateCommand
+from git_project_updater_cli.commands.build_project_command import BuildProjectCommand
 
 
 COMMANDS_REGISTRY = {}
@@ -33,6 +34,7 @@ def register_commands():
     register_command(ProjectVersionUsedInCommand())
     register_command(GitInfoCommand())
     register_command(GitUpdateCommand())
+    register_command(BuildProjectCommand())
     register_command(ExitCommand())
 
 

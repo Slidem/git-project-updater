@@ -1,0 +1,2 @@
+class MavenError(Exception):
+    pass

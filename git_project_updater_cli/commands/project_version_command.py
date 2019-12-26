@@ -12,3 +12,5 @@ class ProjectVersionCommand(Command):
 
     def __str__(self):
         return "=== Project version ==="
+
+
