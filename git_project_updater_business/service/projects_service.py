@@ -45,7 +45,6 @@ class ProjectsService:
         return str(project)
 
     def traverse_project_dependency_tree(self, project_id, traversal_type, node_traversal_observer):
-
         traversal_strategy = createDependencyTreeNodeTraversalStrategy(
             traversal_type,
             node_traversal_observer
@@ -61,11 +60,13 @@ class ProjectsService:
     def get_version_used(self, project_id, project_used_in_id):
         projects = self.projects_repository.projects
         project_used_in = projects.get(project_used_in_id, None)
+
         if not project_used_in:
             return "UNKOWN"
 
         version_used = project_used_in.dependency_tree.get_child_version(
             project_id)
+
         return version_used if version_used else "UNKOWN"
 
     def build_project(self, project_id, *mnv_commands):
@@ -73,8 +74,6 @@ class ProjectsService:
         project = projects.get(project_id, None)
         get_builder(project).build(project, mnv_commands)
 
-    # TODO 
+    # TODO
     def change_version(self, project_id, for_project_id, version):
         pass
-
-    

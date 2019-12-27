@@ -2,7 +2,6 @@ from git_project_updater_business.scanners.converter.project_processor_link impo
 from git_project_updater_business.models.version.version import ChildVersion, ChildVersionType
 from git_project_updater_business.errors.maven_errors import MavenError
 from abc import ABC, abstractmethod
-from enum import enum, auto
 import re
 
 
@@ -39,6 +38,7 @@ class MavenProjectVersionsProcessorLink(ProjectProcessorLink):
 
             child_version = self.__try_to_resolve_child_version(
                 child, project, projects)
+
             if not child_version:
                 raise ValueError(
                     f"No version specified for child : {child.project_id} in project {project.project_id}")
@@ -54,7 +54,7 @@ class MavenProjectVersionsProcessorLink(ProjectProcessorLink):
                     child.project_id, child_version)
 
     def __try_to_resolve_child_version(self, child, project, projects):
-        parent = projects.get(project.parent_project_id, None)
+        parent = projects.get(project.project_parent_id, None)
 
         property_placeholder_resolvers = [
             ProjectVersionPlaceholderResolver(project, parent),
@@ -63,16 +63,13 @@ class MavenProjectVersionsProcessorLink(ProjectProcessorLink):
             ParentPropertiesPlaceholderResolver(project, parent)
         ]
 
-        child_artifact = project.maven_pom.dependencies.get(
-            child.project_id, None)
-
         version_resolvers = [
             ArtifactVersionResolver(
-                child_artifact, project, parent, property_placeholder_resolvers),
+                child, project, parent, property_placeholder_resolvers),
             DependencyManagementVersionResolver(
-                child_artifact, project, parent, property_placeholder_resolvers),
+                child, project, parent, property_placeholder_resolvers),
             ParentDependencyManagementVersionResolver(
-                child_artifact, project, parent, property_placeholder_resolvers)
+                child, project, parent, property_placeholder_resolvers)
         ]
 
         child_version = None
@@ -81,6 +78,8 @@ class MavenProjectVersionsProcessorLink(ProjectProcessorLink):
             child_version = r.resolve()
             if child_version:
                 break
+
+        return child_version
 
 
 # Version resolvers --------------------------------------------------------------------
@@ -92,7 +91,7 @@ class VersionResolver(ABC):
         self.child = child
         self.project = project
         self.parent_project = parent_project
-        self.property_placeholder_resolver
+        self.property_placeholder_resolvers = property_placeholder_resolvers
 
     def resolve(self) -> ChildVersion:
         child_version = self.resolve_child_version()
@@ -101,7 +100,7 @@ class VersionResolver(ABC):
             return None
 
         if is_version_property(child_version.value):
-            property_name = self.__version_property_match(
+            property_name = version_property_match(
                 child_version.value).group(1)
 
             for r in self.property_placeholder_resolvers:
@@ -124,31 +123,40 @@ class ArtifactVersionResolver(VersionResolver):
         child_artifact = self.project.maven_pom.dependencies.get(
             self.child.project_id, None)
 
-        return ChildVersion(child_artifact.version, ChildVersionType.ARTIFACT_VERSION) if child_artifact else None
+        if not child_artifact or not child_artifact.version:
+            return None
+
+        return ChildVersion(child_artifact.version, ChildVersionType.ARTIFACT_VERSION)
 
 
 class DependencyManagementVersionResolver(VersionResolver):
 
     def resolve_child_version(self):
+
         child_artifact_dm = self.project.maven_pom.dependencies_management.get(
             self.child.project_id, None)
 
+        if not child_artifact_dm or not child_artifact_dm.version:
+            return None
+
         return ChildVersion(child_artifact_dm.version,
-                            ChildVersionType.ARTIFACT_VERSION) if child_artifact_dm else None
+                            ChildVersionType.ARTIFACT_VERSION)
 
 
 class ParentDependencyManagementVersionResolver(VersionResolver):
 
     def resolve_child_version(self):
+        if not self.parent_project:
+            return None
 
-        child_artifact_dm = None
+        parent_child_artifact_dm = self.parent_project.maven_pom.dependencies_management.get(
+            self.child.project_id, None)
 
-        if self.parent_project:
-            child_artifact_dm = self.parent_project.maven_pom.dependencies_management.get(
-                self.child.project_id, None)
+        if not parent_child_artifact_dm or not parent_child_artifact_dm.version:
+            return None
 
-        return ChildVersion(child_artifact_dm.version,
-                            ChildVersionType.PARENT_DEPENDECY_MANAGEMENT_ARTIFACT_VERSION) if child_artifact_dm else None
+        return ChildVersion(parent_child_artifact_dm.version,
+                            ChildVersionType.PARENT_DEPENDECY_MANAGEMENT_ARTIFACT_VERSION)
 
 # Property placeholder resolvers--------------------------------------------------------
 # --------------------------------------------------------------------------------------
@@ -172,19 +180,19 @@ class PropertyPlaceholderResolver(ABC):
 class ProjectPropertiesPlaceholderResolver(PropertyPlaceholderResolver):
 
     def accept(self, property_name):
-        return self.project.maven_pom.proprerties.get(property_name, None) != None
+        return self.project.maven_pom.properties.get(property_name, None) != None
 
     def resolve(self, property_name):
-        return ChildVersion(self.project.maven_pom.proprerties[property_name], ChildVersionType.PROJECT_PROPERTY_VERSION)
+        return ChildVersion(self.project.maven_pom.properties[property_name], ChildVersionType.PROJECT_PROPERTY_VERSION)
 
 
 class ParentPropertiesPlaceholderResolver(PropertyPlaceholderResolver):
 
     def accept(self, property_name):
-        return self.parent_project and self.parent_project.maven_pom.proprerties.get(property_name, None) != None
+        return self.parent_project and self.parent_project.maven_pom.properties.get(property_name, None) != None
 
     def resolve(self, property_name):
-        return ChildVersion(self.parent_project.maven_pom.proprerties[property_name], ChildVersionType.PARENT_PROJECT_PROPERTY_VERSION)
+        return ChildVersion(self.parent_project.maven_pom.properties[property_name], ChildVersionType.PARENT_PROJECT_PROPERTY_VERSION)
 
 
 class ProjectVersionPlaceholderResolver(PropertyPlaceholderResolver):

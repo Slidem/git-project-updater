@@ -1,4 +1,4 @@
-from enum import enum, auto
+from enum import Enum, auto
 
 
 class ChildVersion:
@@ -9,9 +9,6 @@ class ChildVersion:
 
     def __str__(self):
         return self.value
-
-    def accept_visitor(self, visitor):
-        visitor.visit(self) 
 
 class MavenChildVersion(ChildVersion):
 
