@@ -4,7 +4,7 @@ from git_project_updater_business.models.git.git_model import git_info_to_str
 
 class GitInfoCommand(Command):
 
-    GIT_INFO_CODE = "8"
+    GIT_INFO_CODE = "9"
 
     def execute(self):
         project_id = input("Print git info for project id:")

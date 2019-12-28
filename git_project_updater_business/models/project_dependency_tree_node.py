@@ -1,5 +1,5 @@
 from typing import Dict, Any, TypeVar
-from git_project_updater_business.models.version.version import ChildVersion
+from git_project_updater_business.version.models.version import ChildVersion
 
 
 class ProjectDependencyTreeNode:

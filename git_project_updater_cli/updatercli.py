@@ -1,6 +1,7 @@
 from git_project_updater_cli.commands import command_factory
 import logging
 
+
 def main():
     config_cli_logging()
     while True:
@@ -10,8 +11,6 @@ def main():
         print(f"\n{command}")
         command.execute()
 
-def config_cli_logging():
-    logging.basicConfig(level=logging.DEBUG)
 
 def print_menu():
     print("\n======================================================")
@@ -23,11 +22,16 @@ def print_menu():
     print("5.  Print project dependency tree")
     print("6.  Get project version")
     print("7.  Get project version used in...")
-    print("8.  Get project git info")
-    print("9.  Update project git sources")
-    print("10. Build project")
+    print("8.  Change project version")
+    print("9.  Get project git info")
+    print("10. Update project git sources")
+    print("11. Build project")
     print("0.  Exit")
     print("========================================================\n")
+
+
+def config_cli_logging():
+    logging.basicConfig(level=logging.DEBUG)
 
 
 if __name__ == "__main__":

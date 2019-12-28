@@ -24,7 +24,7 @@ class GitUpdateCommandProcessObserver(GitProcessObserver):
 
 class GitUpdateCommand(Command):
 
-    GIT_INFO_CODE = "9"
+    GIT_INFO_CODE = "10"
     UPDATE_PROCESS_OBSERVER = GitUpdateCommandProcessObserver()
 
     def execute(self):

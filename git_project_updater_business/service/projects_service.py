@@ -1,6 +1,7 @@
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
 from git_project_updater_business.utils.node_dependency_tree_traversal import createDependencyTreeNodeTraversalStrategy
 from git_project_updater_business.builders.builders_factory import get_builder
+from git_project_updater_business.version.factories.version_changer_factory import create_maven_changer
 
 
 class ProjectsService:
@@ -74,6 +75,17 @@ class ProjectsService:
         project = projects.get(project_id, None)
         get_builder(project).build(project, mnv_commands)
 
-    # TODO
-    def change_version(self, project_id, for_project_id, version):
-        pass
+    def change_version(self, change_in_project_id, to_change_project_id, version):
+
+        projects = self.projects_repository.projects
+
+        change_in = projects.get(change_in_project_id, None)
+        if not change_in:
+            return
+
+        project_to_change = projects.get(to_change_project_id, None)
+        if not project_to_change or to_change_project_id not in change_in.dependency_tree.children_ids:
+            return
+
+        version_changer = create_maven_changer(project_to_change, change_in)
+        version_changer.change_in(change_in, version)

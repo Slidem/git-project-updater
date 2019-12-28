@@ -10,6 +10,7 @@ from git_project_updater_cli.commands.unknown_command import UnkownCommand
 from git_project_updater_cli.commands.git_info_command import GitInfoCommand
 from git_project_updater_cli.commands.git_update_command import GitUpdateCommand
 from git_project_updater_cli.commands.build_project_command import BuildProjectCommand
+from git_project_updater_cli.commands.change_project_version import ChangeProjectVersionCommand
 
 
 COMMANDS_REGISTRY = {}
@@ -19,7 +20,8 @@ DEFAULT_COMMAND = UnkownCommand()
 
 def register_command(command):
     if command.code in COMMANDS_REGISTRY.keys():
-        raise ValueError(f"Duplicate command found in registry for code {command.code}")
+        raise ValueError(
+            f"Duplicate command found in registry for code {command.code}")
 
     COMMANDS_REGISTRY[command.code] = command
 
@@ -35,6 +37,7 @@ def register_commands():
     register_command(GitInfoCommand())
     register_command(GitUpdateCommand())
     register_command(BuildProjectCommand())
+    register_command(ChangeProjectVersionCommand())
     register_command(ExitCommand())
 
 

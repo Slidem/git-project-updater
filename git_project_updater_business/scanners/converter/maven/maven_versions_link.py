@@ -1,5 +1,5 @@
 from git_project_updater_business.scanners.converter.project_processor_link import ProjectProcessorLink
-from git_project_updater_business.models.version.version import ChildVersion, ChildVersionType
+from git_project_updater_business.version.models.version import ChildVersion, MavenChildVersion, ChildVersionType
 from git_project_updater_business.errors.maven_errors import MavenError
 from abc import ABC, abstractmethod
 import re
@@ -16,6 +16,7 @@ class MavenProjectVersionsProcessorLink(ProjectProcessorLink):
         return projects
 
     def __set_project_version(self, project, projects):
+
         if project.version.upper() != "UNKOWN":
             # skip it, already done
             print("Project version already set")
@@ -183,7 +184,7 @@ class ProjectPropertiesPlaceholderResolver(PropertyPlaceholderResolver):
         return self.project.maven_pom.properties.get(property_name, None) != None
 
     def resolve(self, property_name):
-        return ChildVersion(self.project.maven_pom.properties[property_name], ChildVersionType.PROJECT_PROPERTY_VERSION)
+        return MavenChildVersion(self.project.maven_pom.properties[property_name], ChildVersionType.PROJECT_PROPERTY_VERSION, property_name)
 
 
 class ParentPropertiesPlaceholderResolver(PropertyPlaceholderResolver):
@@ -192,7 +193,7 @@ class ParentPropertiesPlaceholderResolver(PropertyPlaceholderResolver):
         return self.parent_project and self.parent_project.maven_pom.properties.get(property_name, None) != None
 
     def resolve(self, property_name):
-        return ChildVersion(self.parent_project.maven_pom.properties[property_name], ChildVersionType.PARENT_PROJECT_PROPERTY_VERSION)
+        return MavenChildVersion(self.parent_project.maven_pom.properties[property_name], ChildVersionType.PARENT_PROJECT_PROPERTY_VERSION, property_name)
 
 
 class ProjectVersionPlaceholderResolver(PropertyPlaceholderResolver):
