@@ -7,7 +7,6 @@ GitInfo = namedtuple("GitInfo", "branch git_files_status last_commit")
 
 
 def git_info_to_str(git_info):
-    # todo build file status str
     modified_str = "      - modified"
     new_str = "      - new"
     deleted_str = "      - deleted"

@@ -42,7 +42,7 @@ class SettingsRepository:
     __settings_cache = None
 
     @staticmethod
-    def get_instance():
+    def instance():
         if SettingsRepository.__instance is None:
             SettingsRepository()
         return SettingsRepository.__instance

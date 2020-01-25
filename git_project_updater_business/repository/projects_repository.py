@@ -8,7 +8,7 @@ class ProjectsRepository:
     __instance = None
 
     @staticmethod
-    def get_instance(settings_repository: SettingsRepository, project_scanner_factory: ProjectScannerFactory):
+    def instance(settings_repository: SettingsRepository, project_scanner_factory: ProjectScannerFactory):
         if ProjectsRepository.__instance is None:
             ProjectsRepository(settings_repository, project_scanner_factory)
         return ProjectsRepository.__instance

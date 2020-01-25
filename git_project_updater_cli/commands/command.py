@@ -21,15 +21,15 @@ class Command(ABC):
 
     @property
     def settings_repository(self):
-        return SettingsRepository.get_instance()
+        return SettingsRepository.instance()
 
     @property
     def projects_repository(self):
-        return ProjectsRepository.get_instance(self.settings_repository, ProjectScannerFactory.instance())
+        return ProjectsRepository.instance(self.settings_repository, ProjectScannerFactory.instance())
 
     @property
     def projects_service(self):
-        return ProjectsService.get_instance(self.projects_repository)
+        return ProjectsService.instance(self.projects_repository)
 
     @property
     def git_service(self):

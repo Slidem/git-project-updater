@@ -1,0 +1,4 @@
+xmltodict
+pygit2
+flask
+nxpy

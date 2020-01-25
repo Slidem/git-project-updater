@@ -1,7 +1,6 @@
 from git_project_updater_cli.commands import command_factory
 import logging
 
-
 def main():
     config_cli_logging()
     while True:

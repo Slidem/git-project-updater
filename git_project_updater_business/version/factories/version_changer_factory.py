@@ -15,8 +15,8 @@ def create_maven_changer(project, project_to_change_in):
 
 
 def get_for_maven(project, version_used):
-    pr = ProjectsRepository.get_instance(
-        SettingsRepository.get_instance(), ProjectScannerFactory.instance())
+    pr = ProjectsRepository.instance(
+        SettingsRepository.instance(), ProjectScannerFactory.instance())
     
     version_type = version_used.version_type 
 

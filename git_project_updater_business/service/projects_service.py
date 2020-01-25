@@ -8,7 +8,7 @@ class ProjectsService:
     __instance = None
 
     @staticmethod
-    def get_instance(projects_repository):
+    def instance(projects_repository):
         if ProjectsService.__instance is None:
             ProjectsService(projects_repository)
         return ProjectsService.__instance

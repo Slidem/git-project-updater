@@ -24,7 +24,6 @@ class MavenVersionChanger(VersionChanger):
         version_node.text = with_version
         xml_tree.write(path)
 
-
 class MavenVersionChangerXmlPathFinder(ABC):
 
     def __init__(self, projects_repository):
