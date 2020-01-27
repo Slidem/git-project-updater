@@ -23,34 +23,25 @@ def projects():
 
 @app.route("/projects/<project_id>/tree")
 def project_tree(project_id):
-    obs = JsonDependencyTreeTraversal()
-    projects_service.traverse_project_dependency_tree(
-            project_id,
-            TraversalStrategyType.BFS,
-            ProjectDependencyTreeCommand.level_based_printer
-        )
+    project_dep_tree_node = projects_repository.projects.get(project_id).dependency_tree
+    return build_dep_tree_json(project_dep_tree_node, None)
+
+
+def build_dep_tree_json(dependecy_tree_node, parent_project_id):
+    json = {}
+    project_id = dependecy_tree_node.project_id
+    json["projectId"] = project_id 
+    json["version"] = str(projects_service.get_project_version(project_id))
     
-
-class JsonDependencyTreeTraversal(NodeTraversalObserver):
-
-    def __init__(self):
-        super().__init__()
-        self.dependency_tree = {}
-        self.current_level = 1
-        self.parent_children = []
+    if parent_project_id:
+        json["versionUsed"] = str(projects_service.get_version_used(project_id, parent_project_id))
     
-    def node_visited(self, traversal_state):
-        project_id = traversal_state.node.project_id
-        project_info = projects_service.get_project_details(traversal_state.project_id)
-        if traversal_state.level:
-            self.dependency_tree["projectId"] = traversal_state.project_id
-            self.dependency_tree[""]
-            
-            
-        return super().node_visited(traversal_state)
-
     
-
+    if dependecy_tree_node.children:
+        dependencies = [build_dep_tree_json(n, project_id) for n in dependecy_tree_node.children]
+        json["dependencies"] = dependencies
+        
+    return json 
 
 if __name__ == '__main__':
     app.run()
