@@ -1,0 +1,2 @@
+class UpdaterWebappException(Exception):
+    pass
