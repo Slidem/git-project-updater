@@ -6,6 +6,8 @@ from git_project_updater_business.settings.settings_repository import SettingsRe
 from git_project_updater_business.utils.node_dependency_tree_traversal import NodeTraversalObserver, TraversalStrategyType, TraversalSate
 from git_project_updater_webapp.exceptions import UpdaterWebappException
 from git_project_updater_webapp.project_details_mapper import map_to_dict_details
+from git_project_updater_business.service.git_service import GitService
+from git_project_updater_webapp.git_info_mapper import map_git_info_to_json
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -15,6 +17,7 @@ settings_repository = SettingsRepository.instance()
 projects_repository = ProjectsRepository.instance(
     settings_repository, project_scanner_factory)
 projects_service = ProjectsService.instance(projects_repository)
+git_service = GitService.get_instance(projects_repository)
 
 
 @app.route("/projects")
@@ -37,20 +40,18 @@ def project_tree(project_id):
 def project_info(project_id):
     project = get_project_from_repository(project_id) 
     project_type = settings_repository.settings.projects_type
+    git_info = git_service.get_git_info(project_id)
     return {
         "projectId":project_id,
         "projectType": project_type,
         "path":str(project.path),
         "version":project.version,
-        "details":map_to_dict_details(project, project_type) 
+        "details":map_to_dict_details(project, project_type),
+        "git":map_git_info_to_json(git_info)
     }
 
 def get_project_from_repository(project_id):
     project = projects_repository.projects.get(project_id)
-
-    if not project:
-        raise UpdaterWebappException("Project not found for id: " + project_id)
-
     return project
  
 def build_dep_tree_json(dependecy_tree_node, parent_project_id):

@@ -99,10 +99,7 @@ class GitService:
         # perform merge analasys (what would happen if merging current remote into local branch)
         current_branch_name = repo.head.shorthand
         remote_id = repo.lookup_reference(
-            f'refs/remotes/{remote.name}/{current_branch_name}').target
-        merge_result, _ = repo.merge_analysis(remote_id)
-
-        # analyze merge result
+            f'refs/remotes/{remote.name}/{current_branch_name}')
         if merge_result & GIT_MERGE_ANALYSIS_UP_TO_DATE:
             # nothing to do, already up to date
             git_process_observer.up_to_date()
