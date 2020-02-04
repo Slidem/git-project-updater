@@ -6,7 +6,7 @@ from git_project_updater_business.settings.settings_repository import SettingsRe
 from git_project_updater_business.utils.node_dependency_tree_traversal import NodeTraversalObserver, TraversalStrategyType, TraversalSate
 from git_project_updater_webapp.exceptions import UpdaterWebappException
 from git_project_updater_webapp.project_details_mapper import map_to_dict_details
-from git_project_updater_business.service.git_service import GitService
+from git_project_updater_business.service.git_service import GitService, GitProcessObserver
 from git_project_updater_webapp.git_info_mapper import map_git_info_to_json
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ projects_service = ProjectsService.instance(projects_repository)
 git_service = GitService.get_instance(projects_repository)
 
 
-@app.route("/projects")
+@app.route("/projects", methods = ["GET"])
 def projects():
     """
     Returns the a list of projects ids as a json collection
@@ -29,14 +29,14 @@ def projects():
     return response
 
 
-@app.route("/projects/<project_id>/tree")
+@app.route("/projects/<project_id>/tree", methods = ["GET"])
 def project_tree(project_id):
     project_dep_tree_node = get_project_from_repository(project_id).dependency_tree
     return build_dep_tree_json(project_dep_tree_node, None)
 
 
 
-@app.route("/projects/<project_id>/info")
+@app.route("/projects/<project_id>/info", methods = ["GET"])
 def project_info(project_id):
     project = get_project_from_repository(project_id) 
     project_type = settings_repository.settings.projects_type
@@ -49,6 +49,16 @@ def project_info(project_id):
         "details":map_to_dict_details(project, project_type),
         "git":map_git_info_to_json(git_info)
     }
+
+
+@app.route("/projects/<project_id>/git", methods = ["POST"])
+def update_git_project(project_id):
+    update_observer = UpdateGitProjectProcessObserver(project_id)
+    git_service.update_git_sources(project_id, update_observer)
+    return update_observer.response
+
+
+#############################################################################################3
 
 def get_project_from_repository(project_id):
     project = projects_repository.projects.get(project_id)
@@ -70,6 +80,39 @@ def build_dep_tree_json(dependecy_tree_node, parent_project_id):
         json["dependencies"] = dependencies
 
     return json
+
+
+class UpdateGitProjectProcessObserver(GitProcessObserver):
+
+    def __init__(self, project_id):
+        self.__message = ""
+        self.__project_id = project_id 
+        self.__statuts = "success"
+
+    def fetching(self):
+        # do nothing
+        pass
+    
+    def fetching_finished(self):
+        # do nothing
+        pass
+
+    def up_to_date(self):
+        self.__message = f"Updated {self.__project_id}: Project already up to date."
+
+    def performed_fast_forward(self):
+        self.__message = f"Updated {self.__project_id}: Performed fast forward"
+
+    def could_not_update_current_branch(self, branch_name):
+        self.__message = f"Could not update {self.__project_id}: Consider stashing your working directory and try again."
+        self.__state = "failure" 
+
+    @property
+    def response():
+        return {
+            "message":self.__message,
+            "status":self.__statuts
+        }
 
 
 if __name__ == '__main__':
