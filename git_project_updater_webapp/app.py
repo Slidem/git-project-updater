@@ -108,7 +108,7 @@ class UpdateGitProjectProcessObserver(GitProcessObserver):
         self.__state = "failure" 
 
     @property
-    def response():
+    def response(self):
         return {
             "message":self.__message,
             "status":self.__statuts

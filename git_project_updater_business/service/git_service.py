@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from git_project_updater_business.repository.projects_repository import ProjectsRepository
 from git_project_updater_business.models.git.git_model import *
 from git_project_updater_business.utils.date_utils import millis_to_date
-from git_project_updater_business.errors.git_errors import GitError 
+from git_project_updater_business.errors.git_errors import GitError
 
 
 from pygit2 import Repository
@@ -39,7 +39,7 @@ class GitService:
 
         Parameters
         ----------
-        
+
         project_id : str
             The project id to retrieve the info
 
@@ -49,7 +49,7 @@ class GitService:
 
         Raises
         ------
-            ValueError if no project found for the given project_id  
+            ValueError if no project found for the given project_id
             GitError if no git repo found for the given project_id
         """
         project = self.__try_get_project(project_id)
@@ -68,7 +68,7 @@ class GitService:
 
         Parameters
         ----------
-        
+
         project_id : str
             The project id to be updated
 
@@ -82,7 +82,7 @@ class GitService:
 
         Raises
         ------
-            ValueError if no project found for the given project_id  
+            ValueError if no project found for the given project_id
             GitError if no git repo found for the given project_id
         """
 
@@ -99,7 +99,9 @@ class GitService:
         # perform merge analasys (what would happen if merging current remote into local branch)
         current_branch_name = repo.head.shorthand
         remote_id = repo.lookup_reference(
-            f'refs/remotes/{remote.name}/{current_branch_name}')
+            f'refs/remotes/{remote.name}/{current_branch_name}').target
+        merge_result, _ = repo.merge_analysis(remote_id)
+
         if merge_result & GIT_MERGE_ANALYSIS_UP_TO_DATE:
             # nothing to do, already up to date
             git_process_observer.up_to_date()
@@ -107,14 +109,16 @@ class GitService:
         elif merge_result & GIT_MERGE_ANALYSIS_FASTFORWARD:
             repo.checkout_tree(repo.get(remote_id))
             try:
-                master_ref = repo.lookup_reference(f'refs/heads/{current_branch_name}')
+                master_ref = repo.lookup_reference(
+                    f'refs/heads/{current_branch_name}')
                 master_ref.set_target(remote_id)
             except KeyError:
                 repo.create_branch(current_branch_name, repo.get(remote_id))
             repo.head.set_target(remote_id)
             git_process_observer.performed_fast_forward()
         else:
-            git_process_observer.could_not_update_current_branch(current_branch_name)
+            git_process_observer.could_not_update_current_branch(
+                current_branch_name)
 
     def __try_get_project(self, project_id):
         project = self.projects_repository.projects.get(project_id, None)
