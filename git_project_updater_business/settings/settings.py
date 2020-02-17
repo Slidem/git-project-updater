@@ -24,5 +24,3 @@ class Settings:
             projects_type=self.projects_type,
             projects_root_directories=self.projects_root_directory
         )
-
-        self.git_credentials = git

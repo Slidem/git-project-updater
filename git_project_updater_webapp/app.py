@@ -8,6 +8,7 @@ from git_project_updater_webapp.exceptions import UpdaterWebappException
 from git_project_updater_webapp.project_details_mapper import map_to_dict_details
 from git_project_updater_business.service.git_service import GitService, GitProcessObserver
 from git_project_updater_webapp.git_info_mapper import map_git_info_to_json
+from git_project_updater_webapp.settings_mapper import map_settings
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -20,7 +21,7 @@ projects_service = ProjectsService.instance(projects_repository)
 git_service = GitService.get_instance(projects_repository)
 
 
-@app.route("/projects", methods = ["GET"])
+@app.route("/projects", methods=["GET"])
 def projects():
     """
     Returns the a list of projects ids as a json collection
@@ -29,41 +30,68 @@ def projects():
     return response
 
 
-@app.route("/projects/<project_id>/tree", methods = ["GET"])
+@app.route("/projects/settings", methods=["GET"])
+def projects_settings():
+    """
+    Returns the defined projects settings
+    """
+    return map_settings(settings_repository.settings)
+
+
+@app.route("/projects/<project_id>/tree", methods=["GET"])
 def project_tree(project_id):
-    project_dep_tree_node = get_project_from_repository(project_id).dependency_tree
+    project_dep_tree_node = get_project_from_repository(
+        project_id).dependency_tree
     return build_dep_tree_json(project_dep_tree_node, None)
 
 
-
-@app.route("/projects/<project_id>/info", methods = ["GET"])
+@app.route("/projects/<project_id>/info", methods=["GET"])
 def project_info(project_id):
-    project = get_project_from_repository(project_id) 
+    project = get_project_from_repository(project_id)
     project_type = settings_repository.settings.projects_type
     git_info = git_service.get_git_info(project_id)
     return {
-        "projectId":project_id,
+        "projectId": project_id,
         "projectType": project_type,
-        "path":str(project.path),
-        "version":project.version,
-        "details":map_to_dict_details(project, project_type),
-        "git":map_git_info_to_json(git_info)
+        "path": str(project.path),
+        "version": project.version,
+        "details": map_to_dict_details(project, project_type),
+        "git": map_git_info_to_json(git_info)
     }
 
 
-@app.route("/projects/<project_id>/git", methods = ["POST"])
+@app.route("/projects/<project_id>/git", methods=["POST"])
 def update_git_project(project_id):
     update_observer = UpdateGitProjectProcessObserver(project_id)
     git_service.update_git_sources(project_id, update_observer)
     return update_observer.response
 
 
-#############################################################################################3
+@app.route("/projects/<project_id>/build", methods=["POST"])
+def build_maven_project(project_id):
+    status = "success"
+    message = project_id + " build executed"
+
+    try:
+        projects_service.build_project(project_id)
+    except Exception as e:
+        status = "failure"
+        message = project_id + " build failed."
+        print(e)
+    finally:
+        return {
+            "status": status,
+            "message": message
+        }
+
+
+#############################################################################################
 
 def get_project_from_repository(project_id):
     project = projects_repository.projects.get(project_id)
     return project
- 
+
+
 def build_dep_tree_json(dependecy_tree_node, parent_project_id):
     json = {}
     project_id = dependecy_tree_node.project_id
@@ -86,13 +114,13 @@ class UpdateGitProjectProcessObserver(GitProcessObserver):
 
     def __init__(self, project_id):
         self.__message = ""
-        self.__project_id = project_id 
+        self.__project_id = project_id
         self.__statuts = "success"
 
     def fetching(self):
         # do nothing
         pass
-    
+
     def fetching_finished(self):
         # do nothing
         pass
@@ -105,14 +133,16 @@ class UpdateGitProjectProcessObserver(GitProcessObserver):
 
     def could_not_update_current_branch(self, branch_name):
         self.__message = f"Could not update {self.__project_id}: Consider stashing your working directory and try again."
-        self.__state = "failure" 
+        self.__state = "failure"
 
     @property
     def response(self):
         return {
-            "message":self.__message,
-            "status":self.__statuts
+            "message": self.__message,
+            "status": self.__statuts
         }
+
+#############################################################################################
 
 
 if __name__ == '__main__':
